@@ -18,7 +18,7 @@ set (CMAKE_BUILD_TYPE Release CACHE STRING "Build type")
 
 project (nlopt)
 
-find_package(catkin REQUIRED)
+find_package(ament_cmake REQUIRED)
 
 #==============================================================================
 # version
@@ -256,11 +256,6 @@ install (FILES ${NLOPT_HEADERS} DESTINATION ${RELATIVE_INSTALL_INCLUDE_DIR})
 
 set (nlopt_lib nlopt)
 
-catkin_package(
-  INCLUDE_DIRS ${PROJECT_BINARY_DIR} src/api
-  LIBRARIES ${nlopt_lib}
-)
-
 add_library (${nlopt_lib} ${NLOPT_SOURCES})
 add_dependencies(${nlopt_lib} generate-cpp)
 target_link_libraries (${nlopt_lib} ${M_LIBRARY})
@@ -316,6 +311,19 @@ install ( TARGETS ${nlopt_lib}
           LIBRARY DESTINATION ${RELATIVE_INSTALL_LIB_DIR}
           ARCHIVE DESTINATION ${RELATIVE_INSTALL_LIB_DIR}
         )
+
+
+install(
+  TARGETS ${nlopt_lib}
+  EXPORT export_${nlopt_lib}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+  DESTINATION lib/${nlopt_lib}
+)
+
+ament_export_targets(export_${nlopt_lib} HAS_LIBRARY_TARGET)
+ament_export_libraries(${nlopt_lib})
 
 if (MSVC AND BUILD_SHARED_LIBS)
   install (FILES $<TARGET_PDB_FILE:${nlopt_lib}> DESTINATION ${RELATIVE_INSTALL_BIN_DIR} CONFIGURATIONS Debug RelWithDebInfo COMPONENT Debug)
@@ -417,3 +425,5 @@ install (FILES
           ${CMAKE_CURRENT_BINARY_DIR}/NLoptConfigVersion.cmake
          DESTINATION ${RELATIVE_INSTALL_CMAKE_DIR}
          COMPONENT Development)
+
+ament_package()
